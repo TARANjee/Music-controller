@@ -5,7 +5,7 @@ from .models import Room
 
 # it is the end points
 
-class RoomView(generics.ListAPIView):
+class RoomView(generics.CreateAPIView):
     queryset = Room.objects.all()
     serializer_class =  RoomSerializer
       
