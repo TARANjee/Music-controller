@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 ReactDOM.render(
-    <App />,
+    <div className='center'>
+        <App />
+    </div>,
     document.getElementById('app')
 );
