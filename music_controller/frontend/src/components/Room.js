@@ -12,8 +12,8 @@ const Room = () => {
             .then((response) => response.json())
             .then((data) => {
                 setGuestCanPause(data.guest_can_pause),
-                    setVotesToSkip(data.votes_to_skip),
-                    setIsHost(data.is_host)
+                setVotesToSkip(data.votes_to_skip),
+                setIsHost(data.is_host)
             })
     }
     useEffect(() => {

@@ -38,7 +38,7 @@ const RoomJoinPage = () => {
                 </Typography>
             </Grid>
 
-            {/* TextField for enter the code */}
+            {/* TextField for the code */}
 
             <Grid item xs={12} align='center'>
                 <TextField
