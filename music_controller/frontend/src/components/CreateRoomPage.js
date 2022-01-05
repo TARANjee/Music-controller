@@ -8,14 +8,6 @@ const CreateRoomPage = () => {
     const [guestCanPause, setGuestCanPause] = useState(true);
     const [votesToSkip, setVotesToSkip] = useState(defaultvotes);
 
-    const handleVotesSkip = (e) => {
-        setVotesToSkip(e.target.value)
-    }
-
-    const handleGuestCanPause = (e) => {
-        setGuestCanPause(e.target.value === 'true' ? true : false)
-    }
-
     const handleRoomButtonPressed = async () => {
         const requestOptions = {
             method: 'POST',
@@ -46,7 +38,7 @@ const CreateRoomPage = () => {
                         <div align='center'>Guest Control of Playback State</div>
                     </FormHelperText>
 
-                    <RadioGroup row defaultValue='true' onChange={handleGuestCanPause}>
+                    <RadioGroup row defaultValue='true' onChange={(e) => setVotesToSkip(e.target.value)}>
                         <FormControlLabel
                             value='true'
                             control={<Radio color='primary' />}
@@ -75,7 +67,7 @@ const CreateRoomPage = () => {
                             min: 1,
                             style: { textAlign: 'center' },
                         }}
-                        onChange={handleVotesSkip}
+                        onChange={(e) => setGuestCanPause(e.target.value === 'true' ? true : false)}
                     >
                     </TextField>
                     <FormHelperText component="div">

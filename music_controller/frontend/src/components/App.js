@@ -24,6 +24,11 @@ const App = () => {
         }
         useInRoom();
     }, [])
+
+
+    const clearRoomCode = () => {
+        setRoomCode(null)
+    }
     return (
         <Router>
             <Switch>
@@ -33,7 +38,7 @@ const App = () => {
                 </Route>
                 <Route exact path="/join" ><RoomJoinPage /></Route>
                 <Route exact path="/create"><CreateRoomPage /></Route>
-                <Route exact path="/room/:roomCode"><Room /></Route>
+                <Route exact path="/room/:roomCode" render={(props) => <Room {...props} leaveRoomCallback={clearRoomCode} />} ></Route>
             </Switch>
         </Router>
     )
