@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { useParams, useHistory } from 'react-router-dom'
+import CreateRoomPage from './CreateRoomPage';
 
 const Room = ({ leaveRoomCallback }) => {
     const { roomCode } = useParams();
     const history = useHistory();
+    const [showSettings, setShowSettings] = useState(false)
     const [votesToSkip, setVotesToSkip] = useState(2)
     const [guestCanPause, setGuestCanPause] = useState(false)
     const [isHost, setIsHost] = useState(false)
@@ -40,6 +42,40 @@ const Room = ({ leaveRoomCallback }) => {
             })
     }
 
+    const renderSettingButton = () => {
+        return (
+            <Grid item xs={12} align='center'>
+                <Button variant='contained' color='primary' onClick={() => setShowSettings(true)} >Settings</Button>
+            </Grid>
+        );
+    }
+    const renderSetting = () => {
+        return (
+            <Grid container spacing={1}>
+                <Grid item xs={12} align='center'>
+                    <CreateRoomPage
+                        update={true}
+                        votesToSkip={votesToSkip}
+                        guestCanPause={guestCanPause}
+                        roomCode={roomCode}
+                        updateCallback={()=>{}}
+                    />
+                </Grid>
+                <Grid item xs={12} align='center'>
+                    <Button
+                        color='secondary'
+                        variant='contained'
+                        onClick={() => setShowSettings(false)}
+                    >
+                        Close
+                    </Button>
+                </Grid>
+            </Grid>
+        )
+    }
+    if (showSettings){
+        return renderSetting();
+    }
     return (
         <Grid container spacing={1}>
             <Grid item xs={12} align='center'>
@@ -62,6 +98,7 @@ const Room = ({ leaveRoomCallback }) => {
                     Host:{isHost.toString()}
                 </Typography>
             </Grid>
+            {isHost ? (renderSettingButton()) : ("")}
             <Grid item xs={12} align='center' >
                 <Button color='secondary' variant='contained' onClick={leaveButtonPressed} >Leave Room</Button>
             </Grid>
