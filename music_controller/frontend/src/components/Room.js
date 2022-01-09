@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { useParams, useHistory } from 'react-router-dom'
 import CreateRoomPage from './CreateRoomPage';
+import MusicPlayer from './MusicPlayer';
 
 const Room = ({ leaveRoomCallback }) => {
     const { roomCode } = useParams();
     const history = useHistory();
+    const intervalId = useRef(null)
     const [showSettings, setShowSettings] = useState(false)
     const [votesToSkip, setVotesToSkip] = useState(2)
     const [guestCanPause, setGuestCanPause] = useState(false)
     const [isHost, setIsHost] = useState(false)
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false)
+    const [song, setSong] = useState({})
 
     useEffect(() => {
-        getRoomDetails()
+        getRoomDetails();
+        intervalId.current = setInterval(() => {
+            getCurrentSong();
+        }, 1000);
+        return () => {
+            clearInterval(intervalId.current);
+        };
+
     }, [])
 
     const getRoomDetails = async () => {
@@ -29,20 +39,21 @@ const Room = ({ leaveRoomCallback }) => {
                 setGuestCanPause(data.guest_can_pause),
                     setVotesToSkip(data.votes_to_skip),
                     setIsHost(data.is_host)
-                    if(data.is_host){
-                        authenticateSpotify();
-                    }
+
+                if (data.is_host) {
+                    authenticateSpotify();
+                }
 
             });
     }
 
-    console.log(spotifyAuthenticated)
 
     const authenticateSpotify = async () => {
         await fetch('/spotify/is_authenticated')
             .then((response) => response.json())
             .then((data) => {
                 setSpotifyAuthenticated(data.status)
+                console.log(data.status);
                 if (!data.status) {
                     fetch('/spotify/get-auth-url')
                         .then((response) => response.json())
@@ -50,6 +61,21 @@ const Room = ({ leaveRoomCallback }) => {
                             window.location.replace(data.url);
                         })
                 }
+            })
+    }
+
+    const getCurrentSong = async () => {
+        await fetch('/spotify/current-song')
+            .then((response) => {
+                if (!response.ok) {
+                    return {};
+                } else {
+                    return response.json();
+                }
+            })
+            .then((data) => {
+                setSong(data)
+                console.log(data);
             })
     }
 
@@ -66,6 +92,7 @@ const Room = ({ leaveRoomCallback }) => {
                     history.push('/');
                 }
             });
+        clearInterval(intervalId.current);
     }
 
     const renderSettingButton = () => {
@@ -111,19 +138,7 @@ const Room = ({ leaveRoomCallback }) => {
                 </Typography>
             </Grid>
             <Grid item xs={12} align='center'>
-                <Typography variant='h6' component='h6'>
-                    Votes:{votesToSkip}
-                </Typography>
-            </Grid>
-            <Grid item xs={12} align='center'>
-                <Typography variant='h6' component='h6'>
-                    Guest Can Pause :{guestCanPause.toString()}
-                </Typography>
-            </Grid>
-            <Grid item xs={12} align='center'>
-                <Typography variant='h6' component='h6'>
-                    Host:{isHost.toString()}
-                </Typography>
+                <MusicPlayer song={song} />
             </Grid>
             {isHost ? (renderSettingButton()) : ("")}
             <Grid item xs={12} align='center' >
