@@ -10,36 +10,62 @@ const Room = ({ leaveRoomCallback }) => {
     const [votesToSkip, setVotesToSkip] = useState(2)
     const [guestCanPause, setGuestCanPause] = useState(false)
     const [isHost, setIsHost] = useState(false)
+    const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false)
+
+    useEffect(() => {
+        getRoomDetails()
+    }, [])
 
     const getRoomDetails = async () => {
         await fetch(`/api/get-room?code=${roomCode}`)
             .then((response) => {
                 if (!response.ok) {
-                    leaveRoomCallback()
+                    leaveRoomCallback();
                     history.push('/');
                 }
-                return response.json()
+                return response.json();
             })
             .then((data) => {
                 setGuestCanPause(data.guest_can_pause),
                     setVotesToSkip(data.votes_to_skip),
                     setIsHost(data.is_host)
+                    if(data.is_host){
+                        authenticateSpotify();
+                    }
+
+            });
+    }
+
+    console.log(spotifyAuthenticated)
+
+    const authenticateSpotify = async () => {
+        await fetch('/spotify/is_authenticated')
+            .then((response) => response.json())
+            .then((data) => {
+                setSpotifyAuthenticated(data.status)
+                if (!data.status) {
+                    fetch('/spotify/get-auth-url')
+                        .then((response) => response.json())
+                        .then((data) => {
+                            window.location.replace(data.url);
+                        })
+                }
             })
     }
-    useEffect(() => {
-        getRoomDetails()
-    }, [])
 
-    const leaveButtonPressed = async () => {
+
+    const leaveButtonPressed = () => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         };
-        await fetch('/api/leave-room', requestOptions)
+        fetch('/api/leave-room', requestOptions)
             .then((response) => {
-                leaveRoomCallback()
-                history.push('/')
-            })
+                if (response.ok) {
+                    leaveRoomCallback();
+                    history.push('/');
+                }
+            });
     }
 
     const renderSettingButton = () => {
@@ -58,7 +84,7 @@ const Room = ({ leaveRoomCallback }) => {
                         votesToSkip={votesToSkip}
                         guestCanPause={guestCanPause}
                         roomCode={roomCode}
-                        updateCallback={()=>{}}
+                        updateCallback={getRoomDetails}
                     />
                 </Grid>
                 <Grid item xs={12} align='center'>
@@ -73,10 +99,11 @@ const Room = ({ leaveRoomCallback }) => {
             </Grid>
         )
     }
-    if (showSettings){
+    if (showSettings) {
         return renderSetting();
     }
     return (
+
         <Grid container spacing={1}>
             <Grid item xs={12} align='center'>
                 <Typography variant='h4' component='h4'>
@@ -90,7 +117,7 @@ const Room = ({ leaveRoomCallback }) => {
             </Grid>
             <Grid item xs={12} align='center'>
                 <Typography variant='h6' component='h6'>
-                    Guest Can Pause:{guestCanPause.toString()}
+                    Guest Can Pause :{guestCanPause.toString()}
                 </Typography>
             </Grid>
             <Grid item xs={12} align='center'>
