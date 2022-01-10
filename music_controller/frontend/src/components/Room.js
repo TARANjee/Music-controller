@@ -137,7 +137,7 @@ const Room = ({ leaveRoomCallback }) => {
                     Code:{roomCode}
                 </Typography>
             </Grid>
-            <Grid item xs={12} align='center'>
+            <Grid xs={12} align='center'>
                 <MusicPlayer song={song} />
             </Grid>
             {isHost ? (renderSettingButton()) : ("")}

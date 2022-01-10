@@ -21,14 +21,21 @@ const MusicPlayer = ({ song }) => {
         };
         fetch('/spotify/play', requestOptions)
     }
+    const skipSong = () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        };
+        fetch('/spotify/skip', requestOptions)
+    }
 
 
 
     return (
-        <Card >
+        <Card>
             <Grid container alignItems='center'>
                 <Grid item align='center' xs={4}>
-                    <img src={song.image_url} height='100' weight='100' />
+                    <img src={song.image_url} height='200' weight='200' />
                 </Grid>
                 <Grid item align='center' xs={8}>
                     <Typography component='h5' variant='h5'>
@@ -37,11 +44,11 @@ const MusicPlayer = ({ song }) => {
                     <Typography color='textSecondary' variant='subtitle1'>
                         {song.artist}
                         <div>
-                            <IconButton onClick={song.is_playing ? pauseSong : playSong }>
+                            <IconButton onClick={song.is_playing ? pauseSong() : playSong()}>
                                 {song.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
                             </IconButton>
-                            <IconButton>
-                                <SkipNextIcon />
+                            <IconButton onClick={() => skipSong()}>
+                                {song.votes} / <sub>{song.votes_required}</sub> <SkipNextIcon />
                             </IconButton>
                         </div>
                     </Typography>
